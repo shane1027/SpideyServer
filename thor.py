@@ -26,14 +26,33 @@ def usage(status=0):
     sys.exit(status)
 
 def do_request(pid):
+	r = requests.get(URL)
     pass
 
 # Main execution
 
 if __name__ == '__main__':
     # Parse command line arguments
-
+	args = sys.argv[1:]
+	while len(args) and args[0].startswith('=') and len(args[0]) > 1:
+		arg = args.pop(0)
+		if arg == '-v':
+			VERBOSE = true
+		elif arg == '-p':
+			PROCESSES = int(args.pop(0))
+		elif arg == '-r':
+			REQUESTS = int(args.pop(0))
+		elif arg == '-h':
+			usage(0)
+		else:
+			usage(1)
+			
+	if len(args) == 1:
+		URL = args[0]
+		
     # Create pool of workers and perform requests
-    pass
+    pool = multiprocessing.Pool(PROCESSES)
+#    pool.map(do_request(), (URL for x in range(1,REQUESTS)))
+	pass
 
 # vim: set sts=4 sw=4 ts=8 expandtab ft=python:
