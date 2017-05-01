@@ -26,18 +26,28 @@ def usage(status=0):
     sys.exit(status)
 
 def do_request(pid):
-	r = requests.get(URL)
-    pass
+	sum = 0
+	for x in range(0, REQUESTS):
+		begin = time.time()
+		r = requests.get(URL)
+		end = time.time()
+		runTime = end - begin
+		print 'Process: {}, Request: {}, Elapsed time: {}'.format(pid, x, "%.2f" % runTime)
+		sum += runTime
+		
+	averageTime = 1.0*sum/REQUESTS
+	print 'Process: {}, AVERAGE   , Elapsed time: {}'.format(pid, "%.2f" % averageTime)
+	return averageTime
 
 # Main execution
 
 if __name__ == '__main__':
     # Parse command line arguments
 	args = sys.argv[1:]
-	while len(args) and args[0].startswith('=') and len(args[0]) > 1:
+	while len(args) > 1 and args[0].startswith('-') and len(args[0]) > 1:
 		arg = args.pop(0)
 		if arg == '-v':
-			VERBOSE = true
+			VERBOSE = True
 		elif arg == '-p':
 			PROCESSES = int(args.pop(0))
 		elif arg == '-r':
@@ -47,12 +57,17 @@ if __name__ == '__main__':
 		else:
 			usage(1)
 			
-	if len(args) == 1:
-		URL = args[0]
-		
+	URL = args[0]
+	
+	if (VERBOSE):
+		r = requests.get(URL)
+		print r.text
+			
     # Create pool of workers and perform requests
-    pool = multiprocessing.Pool(PROCESSES)
-#    pool.map(do_request(), (URL for x in range(1,REQUESTS)))
+	pool = multiprocessing.Pool(PROCESSES)
+	totalT = pool.map(do_request, range(PROCESSES))
+	averageT = 1.0*sum(totalT) / PROCESSES
+	print 'TOTAL AVERAGE ELAPSED TIME: {}'.format("%.2f" % averageT)
 	pass
 
 # vim: set sts=4 sw=4 ts=8 expandtab ft=python:
