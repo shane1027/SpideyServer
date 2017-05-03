@@ -20,7 +20,7 @@ int parse_request_headers(struct request *r);
  *  3. Accepts a client connection from the server socket.
  *  4. Looks up the client information and stores it in the request struct.
  *  5. Opens the client socket stream for the request struct.
- *  6. Returns the request struct.
+ y:*  6. Returns the request struct.
  *
  * The returned request struct must be deallocated using free_request.
  **/
@@ -28,21 +28,31 @@ struct request * accept_request(int sfd)
 {
     struct request *r;
     struct sockaddr raddr;
-    socklen_t rlen;
+    socklen_t rlen = sizeof(struct request);
 
     /* Allocate request struct (zeroed) */
-    struct request *request = (struct request*)calloc(1, sizeof(struct request));
+    r = calloc(1, sizeof(struct request));
+    
+    // initialize headers
 
     /* Accept a client */
     int client_fd;
     if ((client_fd = accept(sfd, &raddr, &rlen)) < 0) {
     	fprintf(stderr, "Unable to accept: %s\n", strerror(errno));
-    	return NULL;
+    	goto fail;
     }
 
     /* Lookup client information */
-	int status;
+    int status;
+    char* host = r->host;
+    char* port = r->port;
+    if (status = getnameinfo(&raddr, rlen, host, strlen(host), port, strlen(port), 0) != 0) {
+        fprintf(stderr, "Getnameinfo failed: %s\n", gai_strerror(status));
+        goto fail;
+    }
+
     /* Open socket stream */
+    r->file = fdopen(client_fd, "w+");
 
     log("Accepted request from %s:%s", r->host, r->port);
     return r;
@@ -65,19 +75,28 @@ fail:
 void
 free_request(struct request *r)
 {
-    struct header *header;
+    struct header *header;  // not sure what to do with this
 
     if (r == NULL) {
     	return;
     }
 
     /* Close socket or fd */
+    close(r->fd);
 
     /* Free allocated strings */
+    free(r->method);
+    free(r->uri);
+    free(r->path);
+    free(r->query);
 
     /* Free headers */
+    header = r->headers;
+    free(r->headers);
+    free(header);
 
     /* Free request */
+    free(r);
 }
 
 /**
