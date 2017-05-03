@@ -24,19 +24,24 @@ int parse_request_headers(struct request *r);
  *
  * The returned request struct must be deallocated using free_request.
  **/
-struct request *
-accept_request(int sfd)
+struct request * accept_request(int sfd)
 {
     struct request *r;
     struct sockaddr raddr;
     socklen_t rlen;
 
     /* Allocate request struct (zeroed) */
+    struct request *request = (struct request*)calloc(1, sizeof(struct request));
 
     /* Accept a client */
+    int client_fd;
+    if ((client_fd = accept(sfd, &raddr, &rlen)) < 0) {
+    	fprintf(stderr, "Unable to accept: %s\n", strerror(errno));
+    	return NULL;
+    }
 
     /* Lookup client information */
-
+	int status;
     /* Open socket stream */
 
     log("Accepted request from %s:%s", r->host, r->port);
