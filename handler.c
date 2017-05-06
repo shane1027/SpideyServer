@@ -29,11 +29,20 @@ handle_request(struct request *r)
     http_status result;
 
     /* Parse request */
+    int requestStatus;
+    if ((requestStatus = parse_request(r)) != 0) { result = handle_error(r, 404); }
 
     /* Determine request path */
+    char *real = determine_request_path(r->uri);
+    r->path = real;
     debug("HTTP REQUEST PATH: %s", r->path);
 
     /* Dispatch to appropriate request handler type */
+    request_type type = determine_request_type(r->path);
+    if (type == REQUEST_BROWSE) { result = handle_browse_request(r); }
+    else if (type == REQUEST_FILE) { result = handle_file_request(r); }
+    else if (type == REQUEST_CGI) { result = handle_cgi_request(r); }
+    else { result = handle_error(r, 404); }
 
     log("HTTP REQUEST STATUS: %s", http_status_string(result));
     return result;
@@ -54,7 +63,8 @@ handle_browse_request(struct request *r)
     int n;
 
     /* Open a directory for reading or scanning */
-
+	n = scandir(r->path, &entries, NULL, alphasort);
+	 
     /* Write HTTP Header with OK Status and text/html Content-Type */
 
     /* For each entry in directory, emit HTML list item */
