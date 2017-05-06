@@ -38,12 +38,13 @@ usage(const char *progname, int status)
 int
 main(int argc, char *argv[])
 {
-    int c;
+    int c;	// what is this for???
     int sfd;
 
     /* Parse command line options */
 	int argind = 1;
 	char *progname = argv[0];
+	char *path;
 	while (argind < argc && strlen(argv[argind]) > 1 && argv[argind][0] == '-') {
 		char *arg = argv[argind++];
 		if (arg[1] == 'c') {
@@ -60,17 +61,19 @@ main(int argc, char *argv[])
 			Port = argv[argind++];
 		}
 		else if (arg[1] == 'r') {
-			RootPath = argv[argind++];
+			path = argv[argind++];
 		}
 		else if (arg[1] == 'h') {
 			usage(progname, 0);
 		}
 		else { usage(progname, 1); }
 	}
-	
+
     /* Listen to server socket */
+	sfd = socket_listen(Port);
 
     /* Determine real RootPath */
+	RootPath = realpath(path, RootPath);
 
     log("Listening on port %s", Port);
     debug("RootPath        = %s", RootPath);
@@ -79,6 +82,9 @@ main(int argc, char *argv[])
     debug("ConcurrencyMode = %s", ConcurrencyMode == SINGLE ? "Single" : "Forking");
 
     /* Start either forking or single HTTP server */
+    if (ConcurrencyMode == SINGLE) { single_server(sfd); }
+    else { forking_server(sfd); }
+    
     return EXIT_SUCCESS;
 }
 
