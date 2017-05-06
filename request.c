@@ -24,7 +24,7 @@ int parse_request_headers(struct request *r);
  *  3. Accepts a client connection from the server socket.
  *  4. Looks up the client information and stores it in the request struct.
  *  5. Opens the client socket stream for the request struct.
- y:*  6. Returns the request struct.
+ *  6. Returns the request struct.
  *
  * The returned request struct must be deallocated using free_request.
  **/
@@ -37,7 +37,8 @@ struct request * accept_request(int sfd)
     /* Allocate request struct (zeroed) */
     r = calloc(1, sizeof(struct request));
     
-    // initialize headers
+    // unsure about intializing headers
+    r->headers = NULL;
 
     /* Accept a client */
     int client_fd;
