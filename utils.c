@@ -82,9 +82,8 @@ determine_request_path(const char *uri)
     char path[BUFSIZ];
     char real[BUFSIZ];
     char *temp;
-    char *RootPath = "/";
 
-	sprintf(path, "%s%s", RootPath, uri);	// Check if //path works
+	sprintf(path, "%s%s", RootPath, uri);
 	temp = realpath(path, real);
 	strcpy(real, temp);
 	if ((strncmp(RootPath, real, strlen(RootPath)) != 0)) { return NULL; }

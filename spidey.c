@@ -42,7 +42,32 @@ main(int argc, char *argv[])
     int sfd;
 
     /* Parse command line options */
-
+	int argind = 1;
+	char *progname = argv[0];
+	while (argind < argc && strlen(argv[argind]) > 1 && argv[argind][0] == '-') {
+		char *arg = argv[argind++];
+		if (arg[1] == 'c') {
+			if ((streq(argv[argind++], "forking")) == 0) { ConcurrencyMode = FORKING; }
+			else { ConcurrencyMode = SINGLE; }
+		}
+		else if (arg[1] == 'm') {
+			MimeTypesPath = argv[argind++];
+		}
+		else if (arg[1] == 'M') {
+			DefaultMimeType = argv[argind++];
+		}
+		else if (arg[1] == 'p') {
+			Port = argv[argind++];
+		}
+		else if (arg[1] == 'r') {
+			RootPath = argv[argind++];
+		}
+		else if (arg[1] == 'h') {
+			usage(progname, 0);
+		}
+		else { usage(progname, 1); }
+	}
+	
     /* Listen to server socket */
 
     /* Determine real RootPath */
