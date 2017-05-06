@@ -117,10 +117,10 @@ const char *
 http_status_string(http_status status)
 {
     const char *status_string;
-	if (status == HTTP_STATUS_OK) { status_string = "200 OK"; }
-	else if (status == HTTP_STATUS_BAD_REQUEST) { status_string = "400 Bad Request"; }
-	else if (status == HTTP_STATUS_NOT_FOUND) { status_string = "404 Not Found"; }
-	else if (status == HTTP_STATUS_INTERNAL_SERVER_ERROR) { status_string = "500 Internal Server Error"; }
+	if (status == 200) { status_string = "200 OK"; }
+	else if (status == 400) { status_string = "400 Bad Request"; }
+	else if (status == 404) { status_string = "404 Not Found"; }
+	else if (status == 500) { status_string = "500 Internal Server Error"; }
 
     return status_string;
 }
