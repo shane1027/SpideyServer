@@ -110,7 +110,7 @@ parse_request(struct request *r)
 {
     /* Parse HTTP Request Method */
 
-    /* Parse HTTP Requet Headers*/
+    /* Parse HTTP Request Headers*/
 }
 
 /**
@@ -129,10 +129,21 @@ parse_request(struct request *r)
  **/
 int
 parse_request_method(struct request *r)
-{
+{   
+    char buffer[BUFSIZ];
+
     /* Read line from socket */
 
+    LINE = //GET LINE FROM SOCKET...
+
     /* Parse method and uri */
+    if (fgets(buffer, BUFSIZ, LINE) == NULL) {
+        fprintf("fgets failed %s\n", strerror(errno))
+    }
+
+
+    char * method = strtok(buffer, WHITESPACE);
+    char * uri = ;
 
     /* Parse query from uri */
 
