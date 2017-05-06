@@ -51,7 +51,7 @@ struct request * accept_request(int sfd)
 
     /* Lookup client information */
     int status;
-    if (status = getnameinfo(&raddr, rlen, r->host, sizeof(r->host), r->port, sizeof(r->port), 0)) != 0) {
+    if (status = getnameinfo(&raddr, rlen, r->host, sizeof(r->host), r->port, sizeof(r->port), 0) != 0) {
         fprintf(stderr, "Getnameinfo failed: %s\n", gai_strerror(status));
         goto fail;
     }
@@ -122,7 +122,7 @@ parse_request(struct request *r)
         return -1;
     }
 
-    return 0
+    return 0;
 }
 
 /**
