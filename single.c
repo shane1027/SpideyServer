@@ -19,6 +19,7 @@ single_server(int sfd)
     while (true) {
     	/* Accept request */
     	request = accept_request(sfd);
+    	if (request == NULL) { continue; }
 
 		/* Handle request */
 		http_status status = handle_request(request);
