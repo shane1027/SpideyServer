@@ -70,6 +70,13 @@ determine_request_path(const char *uri)
 {
     char path[BUFSIZ];
     char real[BUFSIZ];
+    char *temp;
+    char *RootPath = "/";
+
+	sprintf(path, "%s%s", RootPath, uri);	// Check if //path works
+	temp = realpath(path, real);
+	strcpy(real, temp);
+	if ((strncmp(RootPath, real, strlen(RootPath)) != 0)) { return NULL; }
 
     return strdup(real);
 }
@@ -90,6 +97,13 @@ determine_request_type(const char *path)
 {
     struct stat s;
     request_type type;
+    int status = lstat(path, &s);
+    if (status != 0) { type = REQUEST_BAD; }
+    
+    if (S_ISDIR(s.st_mode)) { type = REQUEST_BROWSE; }
+    else if ((access(path, X_OK)) == 0) { type = REQUEST_CGI; }
+    else if ((access(path, R_OK)) == 0) { type = REQUEST_FILE; }
+    else { type = REQUEST_BAD; }
 
     return (type);
 }
@@ -103,6 +117,10 @@ const char *
 http_status_string(http_status status)
 {
     const char *status_string;
+	if (status == HTTP_STATUS_OK) { status_string = "200 OK"; }
+	else if (status == HTTP_STATUS_BAD_REQUEST) { status_string = "400 BAD REQUEST"; }
+	else if (status == HTTP_STATUS_NOT_FOUND) { status_string = "404 NOT FOUND"; }
+	else if (status == HTTP_STATUS_INTERNAL_SERVER_ERROR) { status_string = "500 INTERNAL SERVER ERROR"; }
 
     return status_string;
 }
@@ -113,6 +131,8 @@ http_status_string(http_status status)
 char *
 skip_nonwhitespace(char *s)
 {
+	chomp(s);
+	while ((*s != NULL) && (!isspace(*s))) { s++; }
     return s;
 }
 
@@ -122,6 +142,8 @@ skip_nonwhitespace(char *s)
 char *
 skip_whitespace(char *s)
 {
+	chomp(s);
+	while ((*s != NULL) && (isspace(*s))) { s++; }
     return s;
 }
 
