@@ -228,6 +228,13 @@ parse_request_headers(struct request *r)
 
     }
 
+    /*
+    //Check if no headers?
+    if (r->header == NULL) {
+        goto fail;
+    }
+    */
+
 #ifndef NDEBUG
     for (struct header *header = r->headers; header != NULL; header = header->next) {
     	debug("HTTP HEADER %s = %s", header->name, header->value);
