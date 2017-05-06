@@ -7,6 +7,10 @@
 
 #include <unistd.h>
 
+/* Constants */
+#define WHITESPACE              " \t\n"
+
+
 int parse_request_method(struct request *r);
 int parse_request_headers(struct request *r);
 
@@ -28,7 +32,7 @@ struct request * accept_request(int sfd)
 {
     struct request *r;
     struct sockaddr raddr;
-    socklen_t rlen = sizeof(struct request);
+    socklen_t rlen = sizeof(struct sockaddr);
 
     /* Allocate request struct (zeroed) */
     r = calloc(1, sizeof(struct request));
@@ -42,11 +46,11 @@ struct request * accept_request(int sfd)
     	goto fail;
     }
 
+    r->fd = client_fd;
+
     /* Lookup client information */
     int status;
-    char* host = r->host;
-    char* port = r->port;
-    if (status = getnameinfo(&raddr, rlen, host, strlen(host), port, strlen(port), 0) != 0) {
+    if (status = getnameinfo(&raddr, rlen, r->host, sizeof(r->host), r->port, sizeof(r->port), 0)) != 0) {
         fprintf(stderr, "Getnameinfo failed: %s\n", gai_strerror(status));
         goto fail;
     }
@@ -109,8 +113,15 @@ int
 parse_request(struct request *r)
 {
     /* Parse HTTP Request Method */
-
+    if ( parse_request_method(r) < 0 ) {
+        return -1;
+    }
     /* Parse HTTP Request Headers*/
+    if ( parse_request_headers(r) < 0) {
+        return -1;
+    }
+
+    return 0
 }
 
 /**
@@ -134,20 +145,27 @@ parse_request_method(struct request *r)
 
     /* Read line from socket */
 
-    LINE = //GET LINE FROM SOCKET...
+    LINE = r->file;
 
     /* Parse method and uri */
     if (fgets(buffer, BUFSIZ, LINE) == NULL) {
-        fprintf("fgets failed %s\n", strerror(errno))
+        fprintf("fgets failed %s", strerror(errno));
     }
 
 
     char * method = strtok(buffer, WHITESPACE);
-    char * uri = ;
+    char * uri = strtok(NULL, '?');
 
-    /* Parse query from uri */
+    //NOTE TO SELF: Remember that this means it won't work if there is a second '?'' in the query string
+    char * query = strtok(NULL, WHITESPACE)
+
+    /* ≈ */
 
     /* Record method, uri, and query in request struct */
+
+    r->method = strdup(method);
+    r->uri = strdup(uri);
+    r->query = strdup(query);
 
     debug("HTTP METHOD: %s", r->method);
     debug("HTTP URI:    %s", r->uri);
@@ -190,8 +208,24 @@ parse_request_headers(struct request *r)
     char buffer[BUFSIZ];
     char *name;
     char *value;
+
+    r->header = curr;
+
     
     /* Parse headers from socket */
+
+    while( fgets(buffer, BUFSIZ, r->file) && strlen(buffer) > 2)  {
+        curr = calloc(1, sizeof(struct header));
+
+        name = strtok(buffer, ':');
+        value = strtok(NULL, '\r\n');
+
+        curr->name = strdup(name)
+        curr->value = strdup(value)
+        
+        curr = curr->next;
+
+    }
 
 #ifndef NDEBUG
     for (struct header *header = r->headers; header != NULL; header = header->next) {
