@@ -118,9 +118,9 @@ http_status_string(http_status status)
 {
     const char *status_string;
 	if (status == HTTP_STATUS_OK) { status_string = "200 OK"; }
-	else if (status == HTTP_STATUS_BAD_REQUEST) { status_string = "400 BAD REQUEST"; }
-	else if (status == HTTP_STATUS_NOT_FOUND) { status_string = "404 NOT FOUND"; }
-	else if (status == HTTP_STATUS_INTERNAL_SERVER_ERROR) { status_string = "500 INTERNAL SERVER ERROR"; }
+	else if (status == HTTP_STATUS_BAD_REQUEST) { status_string = "400 Bad Request"; }
+	else if (status == HTTP_STATUS_NOT_FOUND) { status_string = "404 Not Found"; }
+	else if (status == HTTP_STATUS_INTERNAL_SERVER_ERROR) { status_string = "500 Internal Server Error"; }
 
     return status_string;
 }
