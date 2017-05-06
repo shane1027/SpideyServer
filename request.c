@@ -146,11 +146,11 @@ parse_request_method(struct request *r)
 
     /* Read line from socket */
 
-    LINE = r->file;
+    char *LINE = r->file;
 
     /* Parse method and uri */
     if (fgets(buffer, BUFSIZ, LINE) == NULL) {
-        fprintf("fgets failed %s", strerror(errno));
+        goto fail;
     }
 
 
@@ -158,7 +158,7 @@ parse_request_method(struct request *r)
     char * uri = strtok(NULL, '?');
 
     //NOTE TO SELF: Remember that this means it won't work if there is a second '?'' in the query string
-    char * query = strtok(NULL, WHITESPACE)
+    char * query = strtok(NULL, WHITESPACE);
 
     /* ≈ */
 
@@ -210,7 +210,7 @@ parse_request_headers(struct request *r)
     char *name;
     char *value;
 
-    r->header = curr;
+    r->headers = curr;
 
     
     /* Parse headers from socket */
@@ -221,8 +221,8 @@ parse_request_headers(struct request *r)
         name = strtok(buffer, ':');
         value = strtok(NULL, '\r\n');
 
-        curr->name = strdup(name)
-        curr->value = strdup(value)
+        curr->name = strdup(name);
+        curr->value = strdup(value);
         
         curr = curr->next;
 
