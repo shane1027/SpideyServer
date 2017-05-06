@@ -132,7 +132,7 @@ char *
 skip_nonwhitespace(char *s)
 {
 	chomp(s);
-	while ((*s != NULL) && (!isspace(*s))) { s++; }
+	while ((!isspace(*s))&& (*s)) { s++; }
     return s;
 }
 
@@ -143,7 +143,7 @@ char *
 skip_whitespace(char *s)
 {
 	chomp(s);
-	while ((*s != NULL) && (isspace(*s))) { s++; }
+	while ((isspace(*s)) && (*s)) { s++; }
     return s;
 }
 
