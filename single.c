@@ -22,7 +22,7 @@ single_server(int sfd)
     	if (request == NULL) { continue; }
 
 		/* Handle request */
-		http_status status = handle_request(request);
+		handle_request(request);
 
 		/* Free request */
 		free_request(request);

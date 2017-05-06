@@ -36,13 +36,24 @@ determine_mimetype(const char *path)
     char *token;
     char buffer[BUFSIZ];
     FILE *fs = NULL;
-    
+
     /* Find file extension */
+	ext = strrchr(path, '.');
 
     /* Open MimeTypesPath file */
-
+	fs = fopen(MimeTypesPath, "r");
+	if (fs == NULL) { goto fail; }
+	 
     /* Scan file for matching file extensions */
-   
+	while (fgets(buffer, BUFSIZ, fs)) {
+   		if (strchr(buffer, '#')) { continue; }
+   		mimetype = strtok(buffer, WHITESPACE);
+   		token = skip_whitespace(buffer);
+   		while ((token = strtok(NULL, WHITESPACE))) {
+   			if (streq(ext, token) == 0) { goto done; }
+   		}
+   		goto fail;
+   	}
 fail:
     mimetype = DefaultMimeType;
 

@@ -23,13 +23,28 @@ forking_server(int sfd)
     /* Accept and handle HTTP request */
     while (true) {
     	/* Accept request */
+    	request = accept_request(sfd);
+    	if (request == NULL) { continue; }
 
 	/* Ignore children */
+		pid = fork();
+		if (pid < 0) {
+			fprintf(stderr, "Fork failed: %s", strerror(errno));
+		}
+		else if (pid == 0) {
+			handle_request(request);
+			close(sfd);
+			exit(0);
+		}
+		else { close(sfd); }
 
 	/* Fork off child process to handle request */
+		free_request(request);
     }
 
     /* Close server socket and exit*/
+    close(sfd);
+    exit(0);
 }
 
 /* vim: set expandtab sts=4 sw=4 ts=8 ft=c: */
