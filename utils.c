@@ -117,6 +117,10 @@ const char *
 http_status_string(http_status status)
 {
     const char *status_string;
+	if (status == HTTP_STATUS_OK) { status_string = "200 OK"; }
+	else if (status == HTTP_STATUS_BAD_REQUEST) { status_string = "400 BAD REQUEST"; }
+	else if (status == HTTP_STATUS_NOT_FOUND) { status_string = "404 NOT FOUND"; }
+	else if (status == HTTP_STATUS_INTERNAL_SERVER_ERROR) { status_string = "500 INTERNAL SERVER ERROR"; }
 
     return status_string;
 }
@@ -127,6 +131,8 @@ http_status_string(http_status status)
 char *
 skip_nonwhitespace(char *s)
 {
+	chomp(s);
+	while ((*s != NULL) && (!isspace(*s))) { s++; }
     return s;
 }
 
@@ -136,6 +142,8 @@ skip_nonwhitespace(char *s)
 char *
 skip_whitespace(char *s)
 {
+	chomp(s);
+	while ((*s != NULL) && (isspace(*s))) { s++; }
     return s;
 }
 
