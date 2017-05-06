@@ -30,7 +30,7 @@ handle_request(struct request *r)
 
     /* Parse request */
     int requestStatus;
-    if ((requestStatus = parse_request(r)) != 0) { result = handle_error(r, 404); }
+    if ((requestStatus = parse_request(r)) != 0) { result = handle_error(r, HTTP_STATUS_BAD_REQUEST); }
 
     /* Determine request path */
     char *real = determine_request_path(r->uri);
