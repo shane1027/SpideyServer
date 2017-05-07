@@ -19,16 +19,20 @@ single_server(int sfd)
     while (true) {
     	/* Accept request */
     	request = accept_request(sfd);
-    	if (request == NULL) { continue; }
+        debug("received request");
+    	if (request == NULL) { debug("NULL request");continue; }
 
+        debug("about to handle request");
 		/* Handle request */
 		handle_request(request);
 
+                debug("about to free request");
 		/* Free request */
 		free_request(request);
     }
 
     /* Close socket and exit */
+    debug("about to close socket");
     close(sfd);
     exit(0);
 }

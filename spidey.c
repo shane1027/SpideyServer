@@ -94,9 +94,12 @@ main(int argc, char *argv[])
         debug("about to listen to server socket");
     /* Listen to server socket */
 	sfd = socket_listen(Port);
-
+        
+        debug("determining real rootpath");
     /* Determine real RootPath */
-	RootPath = realpath(path, RootPath);
+	RootPath = realpath(RootPath, NULL);
+
+        debug("done with rootpath");
 
     log("Listening on port %s", Port);
     debug("RootPath        = %s", RootPath);

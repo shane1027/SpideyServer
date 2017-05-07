@@ -29,7 +29,6 @@ int socket_listen(const char *port)
 
     debug("got into socket_listen");
 
-
 	// not sure what to use for host, currently NULL
 
     /* Lookup server address information */
@@ -49,6 +48,8 @@ int socket_listen(const char *port)
 			fprintf(stderr, "Unable to make socket: %s\n", strerror(errno));
 			continue;
 		}
+
+                debug("Binding socket");
 		
 		/* Bind socket */
 		if (bind(socket_fd, p->ai_addr, p->ai_addrlen) < 0) {
@@ -57,6 +58,8 @@ int socket_listen(const char *port)
 			socket_fd = -1;
 			continue;
 		}
+
+                debug("listening to socket");
 		
     	/* Listen to socket */
     	if (listen(socket_fd, SOMAXCONN) < 0) {
@@ -67,7 +70,9 @@ int socket_listen(const char *port)
     	}
     }
 
+    debug("about to free the results");
     freeaddrinfo(results);
+    debug("returning");
     return socket_fd;
 }
 

@@ -30,20 +30,27 @@ handle_request(struct request *r)
 
     /* Parse request */
     int requestStatus;
-    if ((requestStatus = parse_request(r)) != 0) { result = handle_error(r, HTTP_STATUS_BAD_REQUEST); }
+    if ((requestStatus = parse_request(r)) != 0) { 
+        debug("request status was bad");
+        result = handle_error(r, HTTP_STATUS_BAD_REQUEST); }
+
+    debug("request parsed");
 
     /* Determine request path */
     char *real = determine_request_path(r->uri);
+    debug("determined request path");
     r->path = real;
     debug("HTTP REQUEST PATH: %s", r->path);
 
     /* Dispatch to appropriate request handler type */
     request_type type = determine_request_type(r->path);
+    debug("request type determined to be %d", type);
     if (type == REQUEST_BROWSE) { result = handle_browse_request(r); }
     else if (type == REQUEST_FILE) { result = handle_file_request(r); }
     else if (type == REQUEST_CGI) { result = handle_cgi_request(r); }
     else { result = handle_error(r, 404); }
 
+    debug("about to log result: %d", result);
     log("HTTP REQUEST STATUS: %s", http_status_string(result));
     return result;
 }
@@ -65,6 +72,8 @@ handle_browse_request(struct request *r)
     /* Open a directory for reading or scanning */
 	n = scandir(r->path, &entries, NULL, alphasort);
 
+        debug("directory opened");
+
         if (n < 0) {
             fprintf(stderr, "scanning dir returned an error\n");
             exit(EXIT_FAILURE);
@@ -84,12 +93,15 @@ handle_browse_request(struct request *r)
         fputs("</ul>\r\n", r->file);
         fputs("</html>", r->file);
 
+        debug("printed all entries");
     
     /* Flush socket, return OK */
 
         if (fflush(r->file)) {
             fprintf(stderr, "Error flushing socket!\n");
         }
+
+        debug("flushed socket");
 
     return HTTP_STATUS_OK;
 }
@@ -108,7 +120,7 @@ handle_file_request(struct request *r)
     FILE *fs;
     char buffer[BUFSIZ];
     char *mimetype = NULL;
-    size_t nread;
+    //size_t nread;
 
     /* Open file for reading */
     if ((fs = fopen(r->path, "r")) == NULL) {
@@ -117,7 +129,9 @@ handle_file_request(struct request *r)
     }
 
     /* Determine mimetype */
+    debug("checking mimetype");
     mimetype = determine_mimetype(r->path);
+    debug("mimetype determined to be %s", mimetype);
 
     /* Write HTTP Headers with OK status and determined Content-Type */
         char return_string[BUFSIZ] = "HTTP/1.0 200 OK\r\nContent-Type: ";

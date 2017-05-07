@@ -144,6 +144,8 @@ parse_request_method(struct request *r)
 {   
     char buffer[BUFSIZ];
 
+    debug("parsing method");
+
     /* Read line from socket */
 
     if (fgets(buffer, BUFSIZ, r->file) == NULL) {
@@ -153,18 +155,27 @@ parse_request_method(struct request *r)
     /* Parse method and uri */
 
     char * method = strtok(buffer, WHITESPACE);
-    char * uri = strtok(NULL, "?");
+    char * uri = strtok(NULL, WHITESPACE);
+
+    debug("got method and uri");
 
     //NOTE TO SELF: Remember that this means it won't work if there is a second '?'' in the query string
-    char * query = strtok(NULL, WHITESPACE);
+    char * query = strchr(uri, '?');
+
+    debug("got query");
 
     /* ≈ */
 
     /* Record method, uri, and query in request struct */
+    debug("METHOD: %s", method);
+    debug("URI: %s", uri);
 
     r->method = strdup(method);
     r->uri = strdup(uri);
-    r->query = strdup(query);
+    if (query) {
+        debug("QUERY: %s", ++query);
+        r->query = strdup(++query);
+    }
 
     debug("HTTP METHOD: %s", r->method);
     debug("HTTP URI:    %s", r->uri);
@@ -207,6 +218,8 @@ parse_request_headers(struct request *r)
     char buffer[BUFSIZ];
     char *name;
     char *value;
+
+    debug("parsing header");
 
     r->headers = curr;
 

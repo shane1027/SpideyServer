@@ -69,10 +69,10 @@ int		    parse_request(struct request *request);
 /* HTTP Request Handlers */
 
 typedef enum {
-    REQUEST_BROWSE,
-    REQUEST_FILE,
-    REQUEST_CGI,
-    REQUEST_BAD,
+    REQUEST_BROWSE = 1,
+    REQUEST_FILE = 2,
+    REQUEST_CGI = 3,
+    REQUEST_BAD = 4,
 } request_type;
 
 typedef enum {

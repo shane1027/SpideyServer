@@ -34,33 +34,52 @@ determine_mimetype(const char *path)
     char *ext;
     char *mimetype;
     char *token;
+    char *temp;
     char buffer[BUFSIZ];
     FILE *fs = NULL;
 
     /* Find file extension */
 	ext = strrchr(path, '.');
+        ext++;
+        debug("extension is %s", ext);
 
     /* Open MimeTypesPath file */
 	fs = fopen(MimeTypesPath, "r");
-	if (fs == NULL) { goto fail; }
+	if (fs == NULL) { debug("couldn't open mime.types"); goto fail; }
 	 
     /* Scan file for matching file extensions */
 	while (fgets(buffer, BUFSIZ, fs)) {
    		if (strchr(buffer, '#')) { continue; }
+                temp = strdup(buffer);
    		mimetype = strtok(buffer, WHITESPACE);
-   		token = skip_whitespace(buffer);
+                debug("buffer:%s", buffer);
+                debug("mimetype:%s", mimetype);
+   		token = skip_whitespace(skip_nonwhitespace(temp));
+                debug("tokens:%s", token);
+                temp = strtok(token, WHITESPACE);                 
+                debug("first token:%s", temp);
+
    		while ((token = strtok(NULL, WHITESPACE))) {
-   			if (streq(ext, token) == 0) { goto done; }
+   		if (strcmp(ext, token) == 0 && (strlen(token) == strlen(ext))) {
+                    free(temp); 
+                    goto done; }
    		}
-   		goto fail;
    	}
+            free(temp);
+            debug("Couldn't find matching extension");
+            goto fail;
 fail:
     mimetype = DefaultMimeType;
+    debug("failed, using default mimetype %s", mimetype);
+
+    return strdup(mimetype);
 
 done:
+    debug("Found extension: %s", ext);
     if (fs) {
         fclose(fs);
     }
+    debug("Returning mimetype %s", mimetype);
     return strdup(mimetype);
 }
 
@@ -83,10 +102,23 @@ determine_request_path(const char *uri)
     char real[BUFSIZ];
     char *temp;
 
+        debug("RootPath: %s", RootPath);
+        debug("URI: %s", uri);
 	sprintf(path, "%s%s", RootPath, uri);
-	temp = realpath(path, real);
+        debug("Path is currently: %s", path);
+	temp = realpath(path, NULL);
+        debug("temp is currently: %s", temp);
 	strcpy(real, temp);
-	if ((strncmp(RootPath, real, strlen(RootPath)) != 0)) { return NULL; }
+
+	if ((strncmp(RootPath, real, strlen(RootPath)) != 0)) {
+            debug("Something wrong with RootPath");
+            free(temp);
+            return NULL;
+        }
+
+        free(temp);
+
+        debug("Real is currently: %s", real);
 
     return strdup(real);
 }
@@ -127,10 +159,12 @@ const char *
 http_status_string(http_status status)
 {
     const char *status_string;
-	if (status == 200) { status_string = "200 OK"; }
-	else if (status == 400) { status_string = "400 Bad Request"; }
-	else if (status == 404) { status_string = "404 Not Found"; }
-	else if (status == 500) { status_string = "500 Internal Server Error"; }
+	if (status == HTTP_STATUS_OK) { status_string = "200 OK"; }
+	else if (status == HTTP_STATUS_BAD_REQUEST) { status_string = "400 Bad Request"; }
+	else if (status == HTTP_STATUS_NOT_FOUND) { status_string = "404 Not Found"; }
+	else if (status == HTTP_STATUS_INTERNAL_SERVER_ERROR) { status_string = "500 Internal Server Error"; } else {
+            return "Unknown status code!";
+        }
 
     return status_string;
 }
