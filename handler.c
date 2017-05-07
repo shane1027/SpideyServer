@@ -121,12 +121,15 @@ handle_file_request(struct request *r)
     char buffer[BUFSIZ];
     char *mimetype = NULL;
     //size_t nread;
+    //
 
     /* Open file for reading */
     if ((fs = fopen(r->path, "r")) == NULL) {
         fprintf(stderr, "Couldn't open file while handling file request\n");
         exit(EXIT_FAILURE);
     }
+
+    debug("File path %s opened successfully", r->path);
 
     /* Determine mimetype */
     debug("checking mimetype");
@@ -176,21 +179,31 @@ handle_cgi_request(struct request *r)
     char buffer[BUFSIZ];
     struct header *header;
 
+    debug("CGI request received");
     /* Export CGI environment variables from request:
     * http://en.wikipedia.org/wiki/Common_Gateway_Interface */
 
     /*  request_path uses strdup, so free when done */
     char * temp_path = determine_request_path(r->uri);
-    setenv("DOCUMENT_ROOT", temp_path, 1);
-    free(temp_path);
 
-    setenv("QUERY_STRING", r->query, 1);
+    debug("got the path: %s", temp_path);
+
+    setenv("DOCUMENT_ROOT", temp_path, 1);
+    debug("DOCUMENT_ROOT set to path");
+    free(temp_path);
+    debug("freed temp_path");
+
+    if (strcmp(r->query,"NULL") != 0)
+        setenv("QUERY_STRING", r->query, 1);
+    debug("got past query");
     setenv("REMOTE_ADDR", r->host, 1);
     setenv("REMOTE_PORT", r->port, 1);
     setenv("REQUEST_METHOD", r->method, 1);
     setenv("REQUEST_URI", r->uri, 1);
     setenv("SCRIPT_FILENAME", r->path, 1);
     setenv("SERVER_PORT", Port, 1);
+
+    debug("all ENV VARS set");
 
 
     /* Export CGI environment variables from request headers */

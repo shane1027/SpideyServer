@@ -175,6 +175,8 @@ parse_request_method(struct request *r)
     if (query) {
         debug("QUERY: %s", ++query);
         r->query = strdup(++query);
+    } else {
+        r->query = "NULL";
     }
 
     debug("HTTP METHOD: %s", r->method);

@@ -20,7 +20,10 @@ single_server(int sfd)
     	/* Accept request */
     	request = accept_request(sfd);
         debug("received request");
-    	if (request == NULL) { debug("NULL request");continue; }
+    	if (request == NULL) { debug("NULL request");
+            
+            close(sfd);
+            continue; }
 
         debug("about to handle request");
 		/* Handle request */
