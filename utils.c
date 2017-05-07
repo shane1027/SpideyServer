@@ -35,6 +35,7 @@ determine_mimetype(const char *path)
     char *mimetype;
     char *token;
     char *temp;
+    char *tmp2;
     char buffer[BUFSIZ];
     FILE *fs = NULL;
 
@@ -56,11 +57,14 @@ determine_mimetype(const char *path)
                 debug("mimetype:%s", mimetype);
    		token = skip_whitespace(skip_nonwhitespace(temp));
                 debug("tokens:%s", token);
-                temp = strtok(token, WHITESPACE);                 
-                debug("first token:%s", temp);
 
-   		while ((token = strtok(NULL, WHITESPACE))) {
-   		if (strcmp(ext, token) == 0 && (strlen(token) == strlen(ext))) {
+
+                tmp2 = strtok(token, WHITESPACE);                 
+                debug("first token:%s", tmp2);
+
+   		while ((tmp2 = strtok(NULL, WHITESPACE))) {
+                debug("next token:%s", tmp2);
+   		if (strcmp(ext, tmp2) == 0 && (strlen(tmp2) == strlen(ext))) {
                     free(temp); 
                     goto done; }
    		}
