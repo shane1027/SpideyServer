@@ -51,7 +51,7 @@ struct request * accept_request(int sfd)
 
     /* Lookup client information */
     int status;
-    if (status = getnameinfo(&raddr, rlen, r->host, sizeof(r->host), r->port, sizeof(r->port), 0) != 0) {
+    if ((status = getnameinfo(&raddr, rlen, r->host, sizeof(r->host), r->port, sizeof(r->port), 0) != 0)) {
         fprintf(stderr, "Getnameinfo failed: %s\n", gai_strerror(status));
         goto fail;
     }
@@ -88,20 +88,35 @@ free_request(struct request *r)
 
     /* Close socket or fd */
     close(r->fd);
+    debug("closed socket");
 
     /* Free allocated strings */
     free(r->method);
     free(r->uri);
     free(r->path);
-    free(r->query);
+    if (strcmp(r->query, "NULL"))
+        free(r->query);
+
+    debug("freed some stuff");
 
     /* Free headers */
     header = r->headers;
+    struct header *tmp;
+
+    while (header) {
+        tmp = header;
+        header = header->next;
+        free(tmp);
+    }
+
+    debug("freed all headers");
+
     free(r->headers);
-    free(header);
+    debug("freed header structure");
 
     /* Free request */
     free(r);
+    debug("freed request!");
 }
 
 /**
@@ -173,8 +188,8 @@ parse_request_method(struct request *r)
     r->method = strdup(method);
     r->uri = strdup(uri);
     if (query) {
-        debug("QUERY: %s", ++query);
         r->query = strdup(++query);
+        debug("QUERY: %s", query);
     } else {
         r->query = "NULL";
     }
