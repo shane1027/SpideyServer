@@ -27,6 +27,8 @@ int socket_listen(const char *port)
     int    socket_fd = -1;
     int status;
 
+    debug("got into socket_listen");
+
 
 	// not sure what to use for host, currently NULL
 
@@ -36,9 +38,12 @@ int socket_listen(const char *port)
     	return -1;
     }
 
+    debug("got the address info");
+
     /* For each server entry, allocate socket and try to connect */
     for (struct addrinfo *p = results; p != NULL && socket_fd < 0; p = p->ai_next) {
 
+    debug("allocating sockets for each server (?)");
 		/* Allocate socket */
 		if ((socket_fd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) < 0) {
 			fprintf(stderr, "Unable to make socket: %s\n", strerror(errno));

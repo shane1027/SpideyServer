@@ -44,30 +44,54 @@ main(int argc, char *argv[])
 	int argind = 1;
 	char *progname = argv[0];
 	char *path;
-	while (argind < argc && strlen(argv[argind]) > 1 && argv[argind][0] == '-') {
+        debug("aboue to check input params");
+
+    if (argc > 0) {
+        debug("found input params");
+	while (argind < argc && strlen(argv[argind]) > 1 && (argv[argind])[0] == '-') {
 		char *arg = argv[argind++];
+                debug("popped arg");
 		if (arg[1] == 'c') {
-			if ((streq(argv[argind++], "forking")) == 0) { ConcurrencyMode = FORKING; }
-			else { ConcurrencyMode = SINGLE; }
+                        debug("handled arg");
+                    if (argind < argc) {
+			if ((strcmp(argv[argind++], "forking")) == 0) {
+                            ConcurrencyMode = FORKING;
+                            debug("concurrency mode: FORKING");
+                        } else {
+                            ConcurrencyMode = SINGLE;
+                            debug("concurrency mode: SINGLE");
+                        }
+                    } else {
+                            debug("concurrency mode: SINGLE");
+                    }
 		}
 		else if (arg[1] == 'm') {
+                        debug("handled arg");
 			MimeTypesPath = argv[argind++];
 		}
 		else if (arg[1] == 'M') {
+                        debug("handled arg");
 			DefaultMimeType = argv[argind++];
 		}
 		else if (arg[1] == 'p') {
+                        debug("handled arg");
 			Port = argv[argind++];
 		}
 		else if (arg[1] == 'r') {
+                        debug("handled arg");
 			path = argv[argind++];
 		}
 		else if (arg[1] == 'h') {
+                        debug("handled arg");
 			usage(progname, 0);
 		}
-		else { usage(progname, 1); }
+		else { 
+                    debug("handled arg");
+                    usage(progname, 1); 
+                }
 	}
-
+    }
+        debug("about to listen to server socket");
     /* Listen to server socket */
 	sfd = socket_listen(Port);
 
