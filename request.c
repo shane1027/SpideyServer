@@ -171,11 +171,14 @@ parse_request_method(struct request *r)
 
     char * method = strtok(buffer, WHITESPACE);
     char * uri = strtok(NULL, WHITESPACE);
+    char * temp_uri = strdup(uri);
 
     debug("got method and uri");
 
     //NOTE TO SELF: Remember that this means it won't work if there is a second '?'' in the query string
     char * query = strchr(uri, '?');
+
+    char * real_uri = strtok(temp_uri, "?");
 
     debug("got query");
 
@@ -183,10 +186,10 @@ parse_request_method(struct request *r)
 
     /* Record method, uri, and query in request struct */
     debug("METHOD: %s", method);
-    debug("URI: %s", uri);
+    debug("URI: %s", real_uri);
 
     r->method = strdup(method);
-    r->uri = strdup(uri);
+    r->uri = strdup(real_uri);
     if (query) {
         r->query = strdup(++query);
         debug("QUERY: %s", query);
@@ -198,6 +201,7 @@ parse_request_method(struct request *r)
     debug("HTTP URI:    %s", r->uri);
     debug("HTTP QUERY:  %s", r->query);
 
+    free(temp_uri);
     return 0;
 
 fail:
