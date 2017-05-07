@@ -138,6 +138,8 @@ handle_file_request(struct request *r)
         strcat(return_string, mimetype);
         strcat(return_string, "\r\n\r\n<html>\r\n\t<ul>\r\n\t");
 
+        fputs(return_string, r->file);
+
         debug("Current HTTP Header: %s", return_string);
 
     /* Read from file and write to socket in chunks */
