@@ -30,8 +30,9 @@ forking_server(int sfd)
 		pid = fork();
 		if (pid < 0) {
 			fprintf(stderr, "Fork failed: %s", strerror(errno));
+			goto finish;
 		}
-		else if (pid == 0) {
+		else if (pid == 0) { //I am child
 			handle_request(request);
 			close(sfd);
 			exit(0);
@@ -42,6 +43,7 @@ forking_server(int sfd)
 		free_request(request);
     }
 
+finish:
     /* Close server socket and exit*/
     close(sfd);
     exit(0);
