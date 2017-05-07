@@ -38,7 +38,6 @@ usage(const char *progname, int status)
 int
 main(int argc, char *argv[])
 {
-    int c;	// what is this for???
     int sfd;
 
     /* Parse command line options */
