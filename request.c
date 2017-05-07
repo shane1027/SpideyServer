@@ -106,6 +106,8 @@ free_request(struct request *r)
     while (header) {
         tmp = header;
         header = header->next;
+        free(tmp->value);
+        free(tmp->name);
         free(tmp);
     }
 

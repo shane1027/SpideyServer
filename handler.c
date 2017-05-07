@@ -34,10 +34,14 @@ handle_request(struct request *r)
         debug("request status was bad");
         result = handle_error(r, HTTP_STATUS_BAD_REQUEST); }
 
-    debug("request parsed");
 
     /* Determine request path */
     char *real = determine_request_path(r->uri);
+    if (strcmp(real, "NULL") == 0) {
+        result = handle_error(r, HTTP_STATUS_NOT_FOUND);
+        return result;
+    }
+    debug("request parsed");
     debug("determined request path");
     r->path = real;
     debug("HTTP REQUEST PATH: %s", r->path);
@@ -48,7 +52,7 @@ handle_request(struct request *r)
     if (type == REQUEST_BROWSE) { result = handle_browse_request(r); }
     else if (type == REQUEST_FILE) { result = handle_file_request(r); }
     else if (type == REQUEST_CGI) { result = handle_cgi_request(r); }
-    else { result = handle_error(r, 404); }
+    else { result = handle_error(r, HTTP_STATUS_NOT_FOUND); }
 
     debug("about to log result: %d", result);
     log("HTTP REQUEST STATUS: %s", http_status_string(result));
@@ -76,6 +80,7 @@ handle_browse_request(struct request *r)
 
         if (n < 0) {
             fprintf(stderr, "scanning dir returned an error\n");
+            //free(n);
             exit(EXIT_FAILURE);
         }
 	 
@@ -99,6 +104,10 @@ handle_browse_request(struct request *r)
 
         if (fflush(r->file)) {
             fprintf(stderr, "Error flushing socket!\n");
+        }
+
+        for (int i = 0; i < n; i++) {
+            free(entries[i]);
         }
 
         debug("flushed socket");
@@ -257,10 +266,12 @@ handle_cgi_request(struct request *r)
 http_status
 handle_error(struct request *r, http_status status)
 {
+    debug("got to the 'handle_error' function");
     const char *status_string = http_status_string(status);
 
     /* Write HTTP Header */
     char return_string[BUFSIZ] = "HTTP/1.0 ";
+    debug("status_string: %s", status_string);
     strcat(return_string, status_string);
     strcat(return_string, "\r\nContent-Type: text/html\r\n\r\n<html>\r\n");
 
@@ -271,6 +282,10 @@ handle_error(struct request *r, http_status status)
 
     fputs(return_string, r->file);
     fputs(error_string, r->file);
+
+    if (fflush(r->file)) {
+        fprintf(stderr, "error flushing socket");
+    }
 
     /* Return specified status */
     return status;

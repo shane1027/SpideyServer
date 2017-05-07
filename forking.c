@@ -35,9 +35,7 @@ forking_server(int sfd)
 		if (pid < 0) {
 			fprintf(stderr, "Fork failed: %s", strerror(errno));
                         //free_request(request);
-                        int status;
-                        waitpid(pid, &status, 0);
-			close(sfd);
+			//close(sfd);
 			continue;
 		}
 		if (pid == 0) { //I am child
@@ -46,13 +44,18 @@ forking_server(int sfd)
                         debug("request handled");
                         free_request(request);
                         debug("request freed");
-			close(sfd);
+			//close(sfd);
+                        //fclose(request->file);
                         debug("closed sfd");
 			exit(0);
 		} else { 
                         debug("got to else");
-			close(sfd); 
+                        int status;
+                        waitpid(pid, &status, 0);
+                        //fclose(request->file);
+			//close(sfd); 
 		}
+                        fclose(request->file);
 
 	/* Fork off child process to handle request */
 		//free_request(request);

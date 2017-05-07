@@ -68,8 +68,8 @@ determine_mimetype(const char *path)
                     free(temp); 
                     goto done; }
    		}
-   	}
             free(temp);
+   	}
             debug("Couldn't find matching extension");
             goto fail;
 fail:
@@ -112,6 +112,9 @@ determine_request_path(const char *uri)
         debug("Path is currently: %s", path);
 	temp = realpath(path, NULL);
         debug("temp is currently: %s", temp);
+        if (temp == NULL) {
+            return "NULL";
+        }
 	strcpy(real, temp);
 
 	if ((strncmp(RootPath, real, strlen(RootPath)) != 0)) {
