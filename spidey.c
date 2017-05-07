@@ -43,7 +43,7 @@ main(int argc, char *argv[])
     /* Parse command line options */
 	int argind = 1;
 	char *progname = argv[0];
-	char *path;
+	//char *path = "1";
         debug("aboue to check input params");
 
     if (argc > 0) {
@@ -79,7 +79,7 @@ main(int argc, char *argv[])
 		}
 		else if (arg[1] == 'r') {
                         debug("handled arg");
-			path = argv[argind++];
+			RootPath = argv[argind++];
 		}
 		else if (arg[1] == 'h') {
                         debug("handled arg");

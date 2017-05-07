@@ -276,8 +276,8 @@ parse_request_headers(struct request *r)
 #endif
     return 0;
 
-fail:
-    return -1;
+//fail:
+    //return -1;
 }
 
 /* vim: set expandtab sts=4 sw=4 ts=8 ft=c: */
