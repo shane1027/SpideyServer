@@ -75,7 +75,6 @@ handle_browse_request(struct request *r)
 
     /* Open a directory for reading or scanning */
 	n = scandir(r->path, &entries, NULL, alphasort);
-
         debug("directory opened");
 
         if (n < 0) {
@@ -83,15 +82,20 @@ handle_browse_request(struct request *r)
             //free(n);
             exit(EXIT_FAILURE);
         }
-	 
+
     /* Write HTTP Header with OK Status and text/html Content-Type */
         char return_string[BUFSIZ] = "HTTP/1.0 200 OK\r\nContent-Type: text/html\r\n\r\n<html>\r\n\t<ul>\r\n\t";
         fputs(return_string, r->file);
 
     /* For each entry in directory, emit HTML list item */
-        for (int i = 0; i < n; i++) {
+        for (int i = 1; i < n; i++) {
+        	char full[BUFSIZ];
+        	char *hyperlink;
+        	sprintf(full, "%s/%s", r->path, entries[i]->d_name);
+        	hyperlink = full + strlen(RootPath);
             fputs("\t<li>", r->file);
-            fputs(entries[i]->d_name, r->file);
+            fprintf(r->file, "<a href=\"%s\">", hyperlink);
+            fprintf(r->file, "%s</a>", entries[i]->d_name);
             fputs("</li>\r\n\t", r->file);
         }
 
@@ -99,7 +103,7 @@ handle_browse_request(struct request *r)
         fputs("</html>", r->file);
 
         debug("printed all entries");
-    
+
     /* Flush socket, return OK */
 
         if (fflush(r->file)) {
@@ -167,7 +171,7 @@ handle_file_request(struct request *r)
         }
 
         free(mimetype);
-        
+
     return HTTP_STATUS_OK;
 }
 

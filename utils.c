@@ -47,7 +47,7 @@ determine_mimetype(const char *path)
     /* Open MimeTypesPath file */
 	fs = fopen(MimeTypesPath, "r");
 	if (fs == NULL) { debug("couldn't open mime.types"); goto fail; }
-	 
+
     /* Scan file for matching file extensions */
 	while (fgets(buffer, BUFSIZ, fs)) {
    		if (strchr(buffer, '#')) { continue; }
