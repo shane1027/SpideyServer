@@ -18,7 +18,8 @@ works compeltely, both with single calls and multiple forked calls.
 
 Latency
 -------
-
+For latency it was fastest to access directory listings, then CGI scripts and then static files.
+When comparing forking mode to single mode data, forking improved latency by approximately 20%
 
 
 Throughput
@@ -41,6 +42,5 @@ in class.
 Contributions
 -------------
 
-Started off with Rae on Thor and then a lot of the functions.
-Rad + Rae then worked on few more functions. 
-Then Shane and Rad finishing + lots of debugging
+All of us worked together to build the functions and then we worked 
+together (for many hours) to figure out all the errors with debugging
