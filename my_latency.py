@@ -13,13 +13,13 @@ URLS = {
         'static_file':
         '{}:{}/text/hackers.txt'.format(HOST,PORT),
         'CGI':
-        'http://student00.cse.nd.edu:{}/scripts/cowsay.sh?message=hi+there+world%21&template=bunny'.format(PORT),
+        '{}:{}/scripts/cowsay.sh?message=hi+there+world%21&template=bunny'.format(HOST,PORT),
         'small_file':
-        'http://student00.cse.nd.edu:{}/test/small.txt'.format(PORT),
+        '{}:{}/test/small.txt'.format(HOST,PORT),
         'medium_file':
-        'http://student00.cse.nd.edu:{}/test/medium.txt'.format(PORT),
+        '{}:{}/test/medium.txt'.format(HOST,PORT),
         'large_file':
-        'http://student00.cse.nd.edu:{}/test/large.txt'.format(PORT)
+        '{}:{}/test/large.txt'.format(HOST,PORT)
     }
 
 DIR_LIST_TIMES = []
