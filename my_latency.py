@@ -92,7 +92,7 @@ with open("/dev/null", 'wb') as f:
 
 with open("/dev/null", 'wb') as f:
     start_time = time.time()
-    r = requests.get(URLS['medium_file'], stream=True))
+    r = requests.get(URLS['medium_file'], stream=True)
     for chunk in r.iter_content(chunk_size=1024):
 	if chunk:
 	    f.write(chunk)
@@ -102,7 +102,7 @@ with open("/dev/null", 'wb') as f:
 
 with open("/dev/null", 'wb') as f:
     start_time = time.time()
-    r = requests.get(URLS['large_file'], stream=True))
+    r = requests.get(URLS['large_file'], stream=True)
     for chunk in r.iter_content(chunk_size=1024):
 	if chunk:
 	    f.write(chunk)
