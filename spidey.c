@@ -93,7 +93,9 @@ main(int argc, char *argv[])
     }
         debug("about to listen to server socket");
     /* Listen to server socket */
-	sfd = socket_listen(Port);
+	do {
+            sfd = socket_listen(Port);
+      } while( sfd == -1 );
         
         debug("determining real rootpath");
     /* Determine real RootPath */
@@ -108,6 +110,7 @@ main(int argc, char *argv[])
     debug("ConcurrencyMode = %s", ConcurrencyMode == SINGLE ? "Single" : "Forking");
 
     /* Start either forking or single HTTP server */
+    
     if (ConcurrencyMode == SINGLE) { single_server(sfd); }
     else { forking_server(sfd); }
     
