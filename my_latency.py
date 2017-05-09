@@ -2,7 +2,6 @@
 
 import requests
 import time
-from tabulate import tabulate
 
 HOST = "http://student00.cse.nd.edu"
 PORT = 9454
@@ -82,35 +81,38 @@ print "#### CGI Script Execution: {} seconds".format(CGI_AVG)
 
 # now check the throughput of the server
 with open("/dev/null", 'wb') as f:
-    r = requests.get(URLS['small_file'])
     start_time = time.time()
+    r = requests.get(URLS['small_file'], stream=True)
     for chunk in r.iter_content(chunk_size=1024):
 	if chunk:
 	    f.write(chunk)
+            f.flush()
     end_time = time.time()
     SMALL_THROUGH = end_time - start_time
 
 with open("/dev/null", 'wb') as f:
     start_time = time.time()
-    r = requests.get(URLS['medium_file'])
+    r = requests.get(URLS['medium_file'], stream=True))
     for chunk in r.iter_content(chunk_size=1024):
 	if chunk:
 	    f.write(chunk)
+            f.flush()
     end_time = time.time()
     MEDIUM_THROUGH = end_time - start_time
 
-#with open("/dev/null", 'wb') as f:
-#    r = requests.get(URLS['large_file'])
-#    start_time = time.time()
-#    for chunk in r.iter_content(chunk_size=1024):
-#	if chunk:
-#	    f.write(chunk)
-#    end_time = time.time()
-#    LARGE_THROUGH = end_time - start_time
+with open("/dev/null", 'wb') as f:
+    start_time = time.time()
+    r = requests.get(URLS['large_file'], stream=True))
+    for chunk in r.iter_content(chunk_size=1024):
+	if chunk:
+	    f.write(chunk)
+            f.flush()
+    end_time = time.time()
+    LARGE_THROUGH = end_time - start_time
 
 print
 print "Small Throughput: 1kb in {} seconds".format(SMALL_THROUGH)
 print "Medium Throughput: 1Mb in {} seconds".format(MEDIUM_THROUGH)
-#print "Large Throughput: 1Gb in {} seconds".format(LARGE_THROUGH)
+print "Large Throughput: 1Gb in {} seconds".format(LARGE_THROUGH)
 
 
