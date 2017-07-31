@@ -152,12 +152,16 @@ handle_file_request(struct request *r)
     /* Write HTTP Headers with OK status and determined Content-Type */
         char return_string[BUFSIZ] = "HTTP/1.0 200 OK\r\nContent-Type: ";
         strcat(return_string, mimetype);
-        strcat(return_string, "\r\n\r\n<html>\r\n\t<ul>\r\n\t");
+        strcat(return_string, "\r\n\r\n");
+        //strcat(return_string, "\r\n\r\n<html>\r\n\t<ul>\r\n\t");
 
         fputs(return_string, r->file);
 
         debug("Current HTTP Header: %s", return_string);
 
+        //TODO: change the following from fgets() to fread()
+        // fpgets() works well with text based things but need to use fread()
+        // for binary files!!
     /* Read from file and write to socket in chunks */
         while(fgets(buffer, BUFSIZ, fs)) {
             fputs(buffer, r->file);
