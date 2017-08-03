@@ -121,35 +121,6 @@ handle_browse_request(struct request *r)
 }
 
 /**
- * Send all data in a buffer to a socket
- *
- * This acts as a wrapper around the send() function to ensure all data in the
- * given buffer is actually sent to the destination, in case the kernel decides
- * to cut us off early
- **/
-int sendall(int socket, char * buf, int len) {
-    
-    int bytes_sent = 0;
-    int total_sent = 0;
-
-    while (total_sent < len) {
-        bytes_sent += send(socket, buf, len, 0);
-        if (bytes_sent) {
-            total_sent += bytes_sent;
-        } else {
-            fprintf(stderr, "Couldn't write to destination socket!\n");
-            return -1;
-        }
-    }
-
-    return total_sent;
-
-}
-
-
-
-
-/**
  * Handle file request
  *
  * This opens and streams the contents of the specified file to the socket.
@@ -161,22 +132,14 @@ http_status
 handle_file_request(struct request *r)
 {
     FILE *fs;
-    int socket_file_descriptor;
     char buffer[BUFSIZ];
     char *mimetype = NULL;
-    size_t byte_count = 0;
-    size_t write_count = 0;
-
+    //size_t nread;
+    //
 
     /* Open file for reading */
-    if ((fs = fopen(r->path, "rb")) == NULL) {      // read binary!
+    if ((fs = fopen(r->path, "r")) == NULL) {
         fprintf(stderr, "Couldn't open file while handling file request\n");
-        exit(EXIT_FAILURE);
-    }
-
-    /* Get the file descriptor  */
-    if (!(socket_file_descriptor = fileno(r->file))) {
-        fprintf(stderr, "Couldn't get file descriptor for file stream!\n");
         exit(EXIT_FAILURE);
     }
 
@@ -191,21 +154,27 @@ handle_file_request(struct request *r)
         char return_string[BUFSIZ] = "HTTP/1.0 200 OK\r\nContent-Type: ";
         strcat(return_string, mimetype);
         strcat(return_string, "\r\n\r\n");
+        //strcat(return_string, "\r\n\r\n<html>\r\n\t<ul>\r\n\t");
 
         fputs(return_string, r->file);
 
         debug("Current HTTP Header: %s", return_string);
 
-    /* Get the current file size    */
-        fseek(fs, 0L, SEEK_END);
-        uint32_t file_size = ftell(fs);
-        rewind(fs);
+        //TODO: change the following from fgets() to fread()
+        // fpgets() works well with text based things but need to use fread()
+        // for binary files!!
+        //
+        
+        /*  get the file size   */
+        fstat()
+        
+        while (fread(buffer, BUFSIZ, fs)) {
+            
+        }
 
     /* Read from file and write to socket in chunks */
-        while((byte_count = fread(buffer, 1, file_size, fs))) {
-            write_count = sendall(socket_file_descriptor, buffer, byte_count);
-            if (byte_count != write_count)
-                fprintf(stderr, "Error writing file to socket!\n");
+        while(fgets(buffer, BUFSIZ, fs)) {
+            fputs(buffer, r->file);
         }
 
     /* Close file, flush socket, deallocate mimetype, return OK */
