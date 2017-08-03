@@ -10,6 +10,8 @@
 #include <dirent.h>
 #include <unistd.h>
 
+#define CHUNK_SIZE 5000
+
 /* Internal Declarations */
 http_status handle_browse_request(struct request *request);
 http_status handle_file_request(struct request *request);
@@ -127,20 +129,25 @@ handle_browse_request(struct request *r)
  * given buffer is actually sent to the destination, in case the kernel decides
  * to cut us off early
  **/
-int sendall(int socket, char * buf, int len) {
+uint64_t sendall(int socket, void * buf, uint64_t len) {
+
+    fprintf(stderr, "length provided: %ld\n", len);
     
-    int bytes_sent = 0;
-    int total_sent = 0;
+    long int bytes_sent = 0;
+    uint64_t total_sent = 0;
 
     while (total_sent < len) {
-        bytes_sent += send(socket, buf, len, 0);
-        if (bytes_sent) {
+        bytes_sent = send(socket, buf, len, 0);
+        fprintf(stderr, "bytes sent: %ld\n", bytes_sent);
+        if (bytes_sent > 0) {
             total_sent += bytes_sent;
         } else {
             fprintf(stderr, "Couldn't write to destination socket!\n");
-            return -1;
+            //return -1;
         }
     }
+
+    fprintf(stderr, "total sent: %ld\n", total_sent);
 
     return total_sent;
 
@@ -162,7 +169,7 @@ handle_file_request(struct request *r)
 {
     FILE *fs;
     int socket_file_descriptor;
-    char buffer[BUFSIZ];
+    uint8_t buffer[CHUNK_SIZE];
     char *mimetype = NULL;
     size_t byte_count = 0;
     size_t write_count = 0;
@@ -194,6 +201,11 @@ handle_file_request(struct request *r)
 
         fputs(return_string, r->file);
 
+    /*  Flush now so that this gets to the socket before the data itself    */
+        if (fflush(r->file)) {
+            fprintf(stderr, "Error flushing socket!\n");
+        }
+
         debug("Current HTTP Header: %s", return_string);
 
     /* Get the current file size    */
@@ -202,7 +214,7 @@ handle_file_request(struct request *r)
         rewind(fs);
 
     /* Read from file and write to socket in chunks */
-        while((byte_count = fread(buffer, 1, file_size, fs))) {
+        while((byte_count = fread(buffer, 1, sizeof(buffer), fs))) {
             write_count = sendall(socket_file_descriptor, buffer, byte_count);
             if (byte_count != write_count)
                 fprintf(stderr, "Error writing file to socket!\n");
