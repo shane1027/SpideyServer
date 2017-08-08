@@ -28,8 +28,7 @@
  *
  * This function returns an allocated string that must be free'd.
  **/
-char *
-determine_mimetype(const char *path)
+char * determine_mimetype(const char *path)
 {
     char *ext;
     char *mimetype;
@@ -40,41 +39,64 @@ determine_mimetype(const char *path)
     FILE *fs = NULL;
 
     /* Find file extension */
-	ext = strrchr(path, '.');
-        ext++;
-        debug("extension is %s", ext);
+    ext = strrchr(path, '.');
+    ext++;
+    debug("extension is %s", ext);
 
     /* Open MimeTypesPath file */
-	fs = fopen(MimeTypesPath, "r");
-	if (fs == NULL) { debug("couldn't open mime.types"); goto fail; }
+    fs = fopen(MimeTypesPath, "r");
+    if (fs == NULL) { debug("couldn't open mime.types"); goto fail; }
 
     /* Scan file for matching file extensions */
-	while (fgets(buffer, BUFSIZ, fs)) {
-   		if (strchr(buffer, '#')) { continue; }
-                temp = strdup(buffer);
-   		mimetype = strtok(buffer, WHITESPACE);
-                //debug("buffer:%s", buffer);
-                //debug("mimetype:%s", mimetype);
-   		token = skip_whitespace(skip_nonwhitespace(temp));
-                //debug("tokens:%s", token);
+    while (fgets(buffer, BUFSIZ, fs)) {
 
+    /*  skip lines that are commented out   */
+        if (strchr(buffer, '#')) { continue; }
 
-                tmp2 = strtok(token, WHITESPACE);                 
-                //debug("first token:%s", tmp2);
+        /*  duplicate buffer because strtok consumes it */
+        temp = strdup(buffer);
+        if (temp == NULL) {
+            fprintf(stderr, "Error: not enough memory to duplicate mimetype buffer :( \n");
+            exit(EXIT_FAILURE);
+        }
+        // debug("buffer:%s", buffer);
+        
+        /*  the first block of text is the mimetype */
+        mimetype = strtok(buffer, WHITESPACE);
+        // debug("mimetype:%s", mimetype);
+        
+        /*  the next block is the extension list    */
+        token = skip_whitespace(skip_nonwhitespace(temp));
 
-   		while ((tmp2 = strtok(NULL, WHITESPACE))) {
-                //debug("next token:%s", tmp2);
-   		if (strcmp(ext, tmp2) == 0 && (strlen(tmp2) == strlen(ext))) {
-                    free(temp); 
-                    goto done; }
-   		}
-            free(temp);
+        /*  if there are no extensions listed, continue */
+        if (isblank(token[0]) || iscntrl(token[0]))  { continue; }
+
+        /*  otherwise, let's start ripping through the extensions, looking for
+         *  a match!    */
+        // debug("tokens:%s", token);
+        tmp2 = strtok(token, WHITESPACE);                 
+        // debug("first token:%s", tmp2);
+
+        while (tmp2) {
+            /*  check if the extension given matches the desired one    */
+            if (strcmp(ext, tmp2) == 0 && (strlen(tmp2) == strlen(ext))) {
+                free(temp); 
+                goto done;
+            }
+
+            /*  if not, move on to the next extension   */
+            tmp2 = strtok(NULL, WHITESPACE);
+            // debug("next token:%s", tmp2);
    	}
-            debug("Couldn't find matching extension");
-            goto fail;
+
+        free(temp);
+    }
+
+    debug("Couldn't find matching extension");
+    goto fail;
+
 fail:
-    //mimetype = DefaultMimeType;
-    mimetype = "text/javascript";
+    mimetype = DefaultMimeType;
     debug("failed, using default mimetype %s", mimetype);
 
     return strdup(mimetype);
@@ -87,6 +109,7 @@ done:
     debug("Returning mimetype %s", mimetype);
     return strdup(mimetype);
 }
+
 
 /**
  * Determine actual filesystem path based on RootPath and URI

@@ -96,7 +96,9 @@ int		    socket_listen(const char *port);
 
 /* Utilities */
 
-#define chomp(s)    (s)[strlen(s) - 1] = '\0'
+#define chomp(s)    if (iscntrl((s)[strlen(s)-1])) {(s)[strlen(s)-1] = '\0';}
+    // this if () was added to prevent last char loss
+
 #define streq(a, b) (strcmp((a), (b)) == 0)
 
 char *		    determine_mimetype(const char *path);
