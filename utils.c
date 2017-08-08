@@ -53,17 +53,17 @@ determine_mimetype(const char *path)
    		if (strchr(buffer, '#')) { continue; }
                 temp = strdup(buffer);
    		mimetype = strtok(buffer, WHITESPACE);
-                debug("buffer:%s", buffer);
-                debug("mimetype:%s", mimetype);
+                //debug("buffer:%s", buffer);
+                //debug("mimetype:%s", mimetype);
    		token = skip_whitespace(skip_nonwhitespace(temp));
-                debug("tokens:%s", token);
+                //debug("tokens:%s", token);
 
 
                 tmp2 = strtok(token, WHITESPACE);                 
-                debug("first token:%s", tmp2);
+                //debug("first token:%s", tmp2);
 
    		while ((tmp2 = strtok(NULL, WHITESPACE))) {
-                debug("next token:%s", tmp2);
+                //debug("next token:%s", tmp2);
    		if (strcmp(ext, tmp2) == 0 && (strlen(tmp2) == strlen(ext))) {
                     free(temp); 
                     goto done; }
@@ -73,7 +73,8 @@ determine_mimetype(const char *path)
             debug("Couldn't find matching extension");
             goto fail;
 fail:
-    mimetype = DefaultMimeType;
+    //mimetype = DefaultMimeType;
+    mimetype = "text/javascript";
     debug("failed, using default mimetype %s", mimetype);
 
     return strdup(mimetype);

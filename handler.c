@@ -131,14 +131,14 @@ handle_browse_request(struct request *r)
  **/
 uint64_t sendall(int socket, void * buf, uint64_t len) {
 
-    fprintf(stderr, "length provided: %ld\n", len);
+    // fprintf(stderr, "length provided: %ld\n", len);
     
     long int bytes_sent = 0;
     uint64_t total_sent = 0;
 
     while (total_sent < len) {
         bytes_sent = send(socket, buf, len, 0);
-        fprintf(stderr, "bytes sent: %ld\n", bytes_sent);
+        // fprintf(stderr, "bytes sent: %ld\n", bytes_sent);
         if (bytes_sent > 0) {
             total_sent += bytes_sent;
         } else {
@@ -147,7 +147,7 @@ uint64_t sendall(int socket, void * buf, uint64_t len) {
         }
     }
 
-    fprintf(stderr, "total sent: %ld\n", total_sent);
+    // fprintf(stderr, "total sent: %ld\n", total_sent);
 
     return total_sent;
 
@@ -219,6 +219,8 @@ handle_file_request(struct request *r)
             if (byte_count != write_count)
                 fprintf(stderr, "Error writing file to socket!\n");
         }
+
+        debug("Sent file of size %d bytes", file_size);
 
     /* Close file, flush socket, deallocate mimetype, return OK */
         fclose(fs);
